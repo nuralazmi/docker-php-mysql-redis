@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    ports:
+      - "8005:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./api:/var/www/html
+    depends_on:
+      - php
+
+  php:
+    container_name: php
+    build:
+      context: ./docker/php
+    volumes:
+      - ./api:/var/www/html
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: docker_mysql
+      MYSQL_DATABASE: docker_mysql
+      MYSQL_USER: docker_mysql
+      MYSQL_PASSWORD: docker_mysql
+    volumes:
+      - ./docker/mysql/example.sql:/docker-entrypoint-initdb.d/example.sql
+    ports:
+      - "3309:3306"
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
